@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+from dvadmin import system
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,13 +31,15 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework'
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "dvadmin.system",
 ]
 
 MIDDLEWARE = [
@@ -89,7 +93,8 @@ DATABASES = {
         "PORT": PORT,
     }
 }
-
+# 表前缀
+TABLE_PREFIX = locals().get('TABLE_PREFIX', "")
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -129,3 +134,32 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ================================================= #
+# *************** REST_FRAMEWORK配置 *************** #
+# ================================================= #
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ]
+}
+
+AUTH_USER_MODEL = "system.Users"
+
+# 系统配置
+SYSTEM_CONFIG = {}
+
+# ================================================= #
+# ******************** 其他配置 ******************** #
+# ================================================= #
+API_LOG_ENABLE = True
+# API_LOG_METHODS = 'ALL' # ['POST', 'DELETE']
+API_LOG_METHODS = ["POST", "UPDATE", "DELETE", "PUT"]  # ['POST', 'DELETE']
+API_MODEL_MAP = {
+    "/token/": "登录模块",
+    "/api/login/": "登录模块",
+    "/api/plugins_market/plugins/": "插件市场",
+}
