@@ -14,16 +14,14 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path
 
 from My_django_vue3_admin import dispatch
 from dvadmin.system.views.system_config import InitSettingsViewSet
-# =========== 初始化系统配置 =================
-dispatch.init_system_config()
-dispatch.init_dictionary()
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/init/settings/',InitSettingsViewSet.as_view()),
 
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("api/init/settings/", InitSettingsViewSet.as_view()),
 ]
