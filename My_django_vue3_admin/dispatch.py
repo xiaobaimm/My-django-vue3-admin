@@ -89,4 +89,3 @@ def get_system_config(schema_name=None):
     else:
         dictionary_config = settings.SYSTEM_CONFIG
     return dictionary_config or {}
-

@@ -310,7 +310,7 @@ class SystemConfig(CoreModel):
         (14, "manytomany"),
         (15, "time"),
     )
-    form_time_type_list = models.IntegerField(
+    form_item_type = models.IntegerField(
         choices=FORM_ITEM_TYPE_LIST,
         verbose_name="表单类型",
         help_text="表单类型",
