@@ -8,6 +8,7 @@ from typing import Callable
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponse, HttpResponseServerError
+from rest_framework.request import Request
 
 from dvadmin.system.models import OperationLog
 from dvadmin.utils.request_util import (
@@ -58,23 +59,46 @@ class ApiLoggingMiddleware:
         request.request_data = get_request_data(request)
         request.request_path = get_request_path(request)
 
-    def _handle_view(self,request):
-        """视图处理前的逻辑"""
+    def _handle_view(self, request:Request):
+        """视图处理前的逻辑（原 process_view）"""
         # 如果API_LOG_ENABLE=False或者request请求不在self.methods列表里就不记录日志，返回
-        if not self.enable or (self.methods != 'ALL' and request.method not in self.methods):
+        if not self.enable:
             return
 
-        # 在 Django 中，当一个请求到达时，URL 调度器会根据 URL 模式找到对应的视图函数，这个匹配结果就存储在 request.resolver_match 中
-        # 定义: queryset 是一个包含模型实例集合的属性，通常用于指定视图操作的数据源
-        # 检查这个视图函数是否属于基于类的视图 and 检查视图函数是否包含 queryset 属性
-        if hasattr(request.resolver_match.func,'cls') and hasattr(request.resolver_match.func.cls, 'queryset'):
-            log = OperationLog(
-                request_modular=get_verbose_name(
-                    request.resolver_match.func.cls.queryset
-                )
-            )
+        # 确保 methods 是可迭代对象并且不是 'ALL'
+        if self.methods != 'ALL':
+            if not isinstance(self.methods, (list, tuple, set)):
+                raise TypeError("self.methods 必须是一个可迭代对象（列表、元组或集合）")
+            if request.method not in self.methods:
+                return
+        #在 Django 中，当一个请求到达时，URL 调度器会根据 URL 模式找到对应的视图函数，这个匹配结果就存储在 request.resolver_match 中
+        #定义: queryset 是一个包含模型实例集合的属性，通常用于指定视图操作的数据源
+        #检查这个视图函数是否属于基于类的视图 and 检查视图函数是否包含 queryset 属性
+        resolver_match = getattr(request, 'resolver_match', None)
+        if not resolver_match:
+            return
+
+        view_func = getattr(resolver_match, 'func', None)
+        if not view_func:
+            return
+
+        view_cls = getattr(view_func, 'cls', None)
+        if not view_cls:
+            return
+
+        queryset = getattr(view_cls, 'queryset', None)
+        if not queryset:
+            return
+
+        try:
+            modular_name = get_verbose_name(queryset)
+            log = OperationLog(request_modular=modular_name)
             log.save()
-            request.request_data["log_id"] = log.id
+            request.request_data['log_id'] = log.id
+        except Exception as e:
+            # 记录异常信息而不阻塞主流程（可根据需要替换为 logger）
+            # print(f"[OperationLog] 日志保存失败: {e}")
+            raise e
 
     def _handle_response(self, request, response):
         """响应处理后的日志记录（原 process_response）"""
