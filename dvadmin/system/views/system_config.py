@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework.views import APIView
 
 from My_django_vue3_admin import dispatch
@@ -7,7 +9,7 @@ from dvadmin.utils.json_response import DetailResponse
 
 class InitSettingsViewSet(APIView):
     """
-    获取初始化配置
+    获取系统配置
     """
 
     authentication_classes = []
@@ -53,6 +55,14 @@ class InitSettingsViewSet(APIView):
                 filter_data[key] = value
         return filter_data
 
+    @extend_schema(
+        summary="获取系统配置",
+        description="获取系统全局配置信息，过滤掉后端专用配置项",
+        responses={"2000":{
+            "type":"string",
+            "example":"成功返回配置信息"
+        }}
+    )
     def get(self, request):
         # 获取系统资源
         data: dict = dispatch.get_system_config()
@@ -63,7 +73,7 @@ class InitSettingsViewSet(APIView):
         # 过滤内容：状态为禁用（status=False）且有父级配置（parent_id__isnull=False）的系统配置项
         # 生成格式：将这些配置项的键名组合成 parent_key.key 格式的字符串列表
         # 用途：在返回系统配置给前端时，排除这些被禁用的配置项，确保前端不会获取到无效的系统配置
-        #注释的代码用self._filter_system_data(data=data)代替，容易理解
+        # 注释的代码用self._filter_system_data(data=data)代替，容易理解
         # data = dict(filter(lambda x: x[0] not in backend_config, data.items()))
         data = self._filter_system_data(data=data)
         return DetailResponse(data)

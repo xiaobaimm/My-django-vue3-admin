@@ -73,7 +73,7 @@ def refresh_system_config():
         settings.SYSTEM_CONFIG = _get_all_system_config()
 
 
-def get_system_config(schema_name=None):
+def get_system_config(schema_name=None) -> dict[str, str | None]:
     """
     获取系统配置中所有配置
     1.只传父级的key，返回全部子级，{ "父级key.子级key" : "值" }
@@ -89,3 +89,14 @@ def get_system_config(schema_name=None):
     else:
         dictionary_config = settings.SYSTEM_CONFIG
     return dictionary_config or {}
+
+
+def get_system_config_values(key: str, schema_name: object = None) -> str | None :
+    """
+    获取系统配置数据并转换为字典 **仅限于数组类型系统配置
+    :param key: 对应系统配置的key值(字典编号)
+    :param schema_name: 对应系统配置的租户schema_name值
+    :return:
+    """
+    system_config: dict[str, str | None] = get_system_config(schema_name)
+    return system_config.get(key, None)

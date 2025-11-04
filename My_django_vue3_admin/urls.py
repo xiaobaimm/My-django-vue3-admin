@@ -17,11 +17,32 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
+from drf_spectacular.views import (
+    SpectacularSwaggerView,
+    SpectacularRedocView,
+    SpectacularAPIView,
+)
 
 from My_django_vue3_admin import dispatch
+from dvadmin.system.views.login import CaptchaView
 from dvadmin.system.views.system_config import InitSettingsViewSet
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/init/settings/", InitSettingsViewSet.as_view()),
+    path("api/captcha/", CaptchaView.as_view()),
+
+    #==============api文档=================================================
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path(
+        "api/schema/swagger-ui/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
+    path(
+        "api/schema/redoc/",
+        SpectacularRedocView.as_view(url_name="schema"),
+        name="redoc",
+    ),
+    #========================================================================
 ]
