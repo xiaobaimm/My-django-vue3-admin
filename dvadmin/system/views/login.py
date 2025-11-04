@@ -18,7 +18,7 @@ class CaptchaView(APIView):
 
     @extend_schema(
         summary="验证码请求",
-        responses={"2000": {"type": "string", "example": "成功返回验证码信息"}},
+        responses={"2000": {"type": "string", "example": "成功返回验证码"}},
     )
     def get(self, request: Request):
         data = {}
