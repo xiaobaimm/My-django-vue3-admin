@@ -26,7 +26,7 @@ class CoreModelManager(models.Manager):
         if flow_work_status:
             queryset = queryset.filter(flow_work_status=1)
         if is_deleted:
-            queryset.filter(is_deleted=False)
+            queryset = queryset.filter(is_deleted=False)
         return queryset
 
     def create(self, request: Request = None, **kwargs):
