@@ -151,6 +151,7 @@ REST_FRAMEWORK = {
     ],
     #一个视图检查器类，它将用于架构生成
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "EXCEPTION_HANDLER": "dvadmin.utils.custom_exception.exception.custom_exception_handler" # 自定义的异常处理
 }
 
 AUTH_USER_MODEL = "system.Users"
