@@ -24,13 +24,14 @@ from drf_spectacular.views import (
 )
 
 from My_django_vue3_admin import dispatch
-from dvadmin.system.views.login import CaptchaView
+from dvadmin.system.views.login import CaptchaView, LoginView
 from dvadmin.system.views.system_config import InitSettingsViewSet
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/init/settings/", InitSettingsViewSet.as_view()),
-    path("api/captcha/", CaptchaView.as_view()),
+    path("api/captcha/", CaptchaView.as_view(),name="login_captcha"),
+    path("api/login/", LoginView.as_view()),
 
     #==============api文档=================================================
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -39,10 +40,11 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
-    path(
-        "api/schema/redoc/",
-        SpectacularRedocView.as_view(url_name="schema"),
-        name="redoc",
-    ),
+    # 没有页面
+    # path(
+    #     "api/schema/redoc/",
+    #     SpectacularRedocView.as_view(url_name="schema"),
+    #     name="redoc",
+    # ),
     #========================================================================
 ]

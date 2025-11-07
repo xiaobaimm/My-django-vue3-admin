@@ -8,5 +8,5 @@ class CustomValidationError(APIException):
     """自定义验证错误"""
 
     def __init__(self, detail=None):
-        super().__init__(detail)
+        self.detail = detail
 
